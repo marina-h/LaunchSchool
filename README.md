@@ -6,5 +6,5 @@ Preparatory materials from Course #100 can be found [here](https://github.com/ma
 ---
 
 ### 101: Programming Foundations
-- [Lesson 2: Small Programs](course_200/lesson_2)
+#### - [Lesson 2: Small Programs](course_101/lesson_2)
 -
