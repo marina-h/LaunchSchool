@@ -1,2 +1,10 @@
-# launch_school
-Repo for all of my Launch School materials
+# Launch School files
+This is a repo that contains all of my Launch School lesson materials.
+
+Preparatory materials from Course #100 can be found [here](https://github.com/marina-h/intro-to-programming-with-ruby) in a different repo.
+
+---
+
+### 101: Programming Foundations
+- [Lesson 2: Small Programs](course_200/lesson_2)
+-
