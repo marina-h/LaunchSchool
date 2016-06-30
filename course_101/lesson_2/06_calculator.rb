@@ -7,7 +7,7 @@ LANGUAGE = 'en'
 # messages are found in calculator_messages.yml
 require 'yaml'
 
-MESSAGES = YAML.load_file('calculator_messages.yml')
+MESSAGES = YAML.load_file('06_calculator_messages.yml')
 
 def messages(message, lang = 'en')
   MESSAGES[lang][message]

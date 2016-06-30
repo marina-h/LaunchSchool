@@ -1,0 +1,28 @@
+# message strings for 06_calculator.rb
+
+en:
+  welcome: "Welcome to Calculator! Enter your name:"
+  valid_name: "Make sure to type in your name."
+  say_hi: "Hi %{name}!"
+  ask_for_input: "Type in two numbers:"
+  num1_prompt: "Number 1 is: "
+  num2_prompt: "Number 2 is: "
+  valid_num: "That isn't a valid input. Please type in a number."
+
+  ask_for_operator: |
+    Which operation should I perform? Please type in the number:
+      1. Addition
+      2. Subtraction
+      3. Multiplication
+      4. Division
+  valid_operator: "Must choose 1, 2, 3, or 4."
+  start_operation: "%{operation_msg} the two numbers..."
+
+  adding: "Adding"
+  subtracting: "Subtracting"
+  multiplying: "Multiplying"
+  dividing: "Dividing"
+
+  answer: "The answer is %{result}!"
+  rerun?: "Do you want to do another calculation? (Type 'Y' for yes)"
+  goodbye: "Thanks for using Calculator, goodbye!"
