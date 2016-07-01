@@ -4,7 +4,7 @@ en:
   welcome: "Welcome to the mortgage/car loan calculator! Please enter your name:"
   valid_name: "Make sure to type in your name."
   say_hi: "Hi %{name}!"
-  ask_for_loan: "What is your loan amount in $? (Example: 250000):"
+  ask_for_loan: "What is your loan amount in $? (Example: '250000' for $250,000):"
   not_valid_loan: "Please enter a valid amount."
   ask_for_apr: "What is your Annual Percentage Rate (APR) in %%? (Example: '5' for a 5%% APR)."
   not_valid_apr: "Please enter a valid percentage."
@@ -15,8 +15,8 @@ en:
 
       Loan amount: $%{loan_total}
               APR: %{annual_rate}%
-         Duration: %{loan_duration_years} years
+         Duration: %{loan_years} years
 
     Your monthly payment is: $%{monthly_payment}
-  repeat?: "Would you like to make another calculation? (Type 'y' for yes)"
+  repeat?: "Would you like to make another calculation? (Type 'y' for yes or 'n' for no)"
   goodbye: "Thanks for using this calculator, %{name}!"
