@@ -31,9 +31,20 @@ def ask_until_valid_num(input, not_valid_prompt)
   end
 end
 
-def calculate_monthly_payment(l, n, c)
-  monthly_payment = l * (c * (1 + c)**n) / ((1 + c)**n - 1)
-  monthly_payment.round
+def calculate_monthly_payment(loan_total, loan_months, monthly_rate)
+  l = loan_total
+  n = loan_months
+  c = monthly_rate
+  l * (c * (1 + c)**n) / ((1 + c)**n - 1)
+end
+
+def another_calculation?
+  loop do
+    answer = gets.chomp.downcase
+    break true if %w(y yes).include?(answer)
+    break false if %w(n no).include?(answer)
+    prompt("yes_or_no")
+  end
 end
 
 name = ""
@@ -72,11 +83,11 @@ loop do
   format_summary = { loan_total: format("%.2f", loan_total),
                      annual_rate: annual_rate,
                      loan_years: loan_years,
-                     monthly_payment: monthly_payment }
+                     monthly_payment: format("%.2f", monthly_payment) }
   prompt("summarize", format_summary)
   prompt("repeat?")
-  answer = gets.chomp
-  break unless answer.downcase.start_with?("y")
+  break unless another_calculation?
+  puts "\n-------------------------------------------------------------------"
 end
 
 prompt("goodbye", { name: name })
