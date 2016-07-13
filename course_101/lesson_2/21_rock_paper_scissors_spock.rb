@@ -40,10 +40,10 @@ def update_scores(choice, computer_choice, scores)
   end
 end
 
-def display_winner_if_exists(score_one, score_two)
-  if score_one == WINNING_SCORE
+def display_winner_if_exists(scores)
+  if scores[:player] == WINNING_SCORE
     prompt("You won, great job!")
-  elsif score_two == WINNING_SCORE
+  elsif scores[:computer] == WINNING_SCORE
     prompt("You lost! Better luck next time.")
   end
 end
@@ -83,8 +83,8 @@ loop do
     prompt("Your score is: #{scores[:player]}. "\
       "The computer's score is: #{scores[:computer]}.\n\n")
 
-    display_winner_if_exists(scores[:player], scores[:computer])
-    break if scores[:player] == 5 || scores[:computer] == 5
+    display_winner_if_exists(scores)
+    break if scores.value?(WINNING_SCORE)
   end
 
   prompt("Do you want to play again?")
