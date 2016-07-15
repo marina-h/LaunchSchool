@@ -71,3 +71,33 @@ def an_illustrative_method(a_outer, b_outer, c_outer, d_outer, a_outer_id, b_out
 end
 
 fun_with_ids
+
+# a_outer is 42 with an id of: 85 before the block.
+# b_outer is forty two with an id of: 70162795673160 before the block.
+# c_outer is [42] with an id of: 70162795673080 before the block.
+# d_outer is 42 with an id of: 85 before the block.
+#
+# a_outer id was 85 before the method and is: 85 inside the method.
+# b_outer id was 70162795673160 before the method and is: 70162795673160 inside the method.
+# c_outer id was 70162795673080 before the method and is: 70162795673080 inside the method.
+# d_outer id was 85 before the method and is: 85 inside the method.
+#
+# a_outer inside after reassignment is 22 with an id of: 85 before and: 45 after.
+# b_outer inside after reassignment is thirty three with an id of: 70162795673160 before and: 70162795672060 after.
+# c_outer inside after reassignment is [44] with an id of: 70162795673080 before and: 70162795672040 after.
+# d_outer inside after reassignment is 44 with an id of: 85 before and: 89 after.
+#
+# a_inner is 22 with an id of: 45 inside the method (compared to 45 for outer).
+# b_inner is thirty three with an id of: 70162795672060 inside the method (compared to 70162795672060 for outer).
+# c_inner is [44] with an id of: 70162795672040 inside the method (compared to 70162795672040 for outer).
+# d_inner is 44 with an id of: 89 inside the method (compared to 89 for outer).
+#
+# a_outer is 42 with an id of: 85 BEFORE and: 85 AFTER the method call.
+# b_outer is forty two with an id of: 70162795673160 BEFORE and: 70162795673160 AFTER the method call.
+# c_outer is [42] with an id of: 70162795673080 BEFORE and: 70162795673080 AFTER the method call.
+# d_outer is 42 with an id of: 85 BEFORE and: 85 AFTER the method call.
+#
+# ugh ohhhhh
+# ugh ohhhhh
+# ugh ohhhhh
+# ugh ohhhhh
