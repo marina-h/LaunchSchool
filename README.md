@@ -7,4 +7,7 @@ Preparatory materials from Course #100 can be found [here](https://github.com/ma
 
 ### 101: Programming Foundations
 #### - [Lesson 2: Small Programs](course_101/lesson_2)
--
+
+#### - [Lesson 3: Exercises](course_101/lesson_3)
+
+#### - [Lesson 4: Slightly Larger Programs](course_101/lesson_4)
