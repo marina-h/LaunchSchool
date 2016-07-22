@@ -14,9 +14,13 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
+def clear_screen
+  system('clear') || system('cls')
+end
+
 # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
 def display_board(brd, scores)
-  system 'clear'
+  clear_screen
   puts "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
   puts "Your score is: #{scores[:player]}. "\
     "The computer's score is: #{scores[:computer]}.\n\n"
@@ -83,15 +87,10 @@ def player_places_piece!(brd)
 end
 
 def computer_places_piece!(brd)
-  square = if find_at_risk_square(brd, COMPUTER_MARKER)
-             find_at_risk_square(brd, COMPUTER_MARKER)
-           elsif find_at_risk_square(brd, PLAYER_MARKER)
-             find_at_risk_square(brd, PLAYER_MARKER)
-           elsif brd[5] == INITIAL_MARKER
-             5
-           else
-             empty_squares(brd).sample
-           end
+  square ||= find_at_risk_square(brd, COMPUTER_MARKER)
+  square ||= find_at_risk_square(brd, PLAYER_MARKER)
+  square ||= 5 if brd[5] == INITIAL_MARKER
+  square ||= empty_squares(brd).sample
   brd[square] = COMPUTER_MARKER
 end
 
@@ -147,16 +146,20 @@ def display_winner_of_round(brd)
 end
 
 def play_again?
-  prompt("Play again? (y or n)")
-  answer = gets.chomp.downcase
-  answer.start_with?('y')
+  prompt("Play again? (Enter 'y' or 'n')")
+  loop do
+    answer = gets.chomp.downcase
+    break true if %w(y yes).include?(answer)
+    break false if %w(n no).include?(answer)
+    prompt("Please enter either 'y' or 'n'.")
+  end
 end
 
 loop do
   scores = { player: 0, computer: 0 }
 
   if ENABLE_CHOOSE_PLAYER
-    system('clear')
+    clear_screen
     FIRST_MOVE = ask_for_first_player
     current_player = FIRST_MOVE
   end
