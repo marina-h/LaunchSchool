@@ -86,11 +86,15 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def place_center_square
+  5 if brd[5] == INITIAL_MARKER
+end
+
 def computer_places_piece!(brd)
-  square ||= find_at_risk_square(brd, COMPUTER_MARKER)
-  square ||= find_at_risk_square(brd, PLAYER_MARKER)
-  square ||= 5 if brd[5] == INITIAL_MARKER
-  square ||= empty_squares(brd).sample
+  square = find_at_risk_square(brd, COMPUTER_MARKER) ||
+           find_at_risk_square(brd, PLAYER_MARKER) ||
+           place_center_square ||
+           empty_squares(brd).sample
   brd[square] = COMPUTER_MARKER
 end
 

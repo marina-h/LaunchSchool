@@ -1,79 +1,81 @@
-SUITS = ['H', 'S', 'C', 'D'].freeze
-VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10',
-          'J', 'Q', 'K', 'A'].freeze
-
-require 'pry'
+SUITS = %w(H S C D).freeze
+VALUES = %w(2 3 4 5 6 7 8 9 10 J Q K A).freeze
+SUIT_NAMES = { 'H': 'hearts',
+               'S': 'spades',
+               'C': 'clubs',
+               'D': 'diamonds' }.freeze
+# set to desired value >= 21
+MAX_TOTAL_VALUE = 21
+DEALER_MAX_VALUE = 17
+WINNING_POINTS = 5
 
 def prompt(msg)
   puts "=> #{msg}"
+end
+
+def clear_screen
+  system('clear') || system('cls')
 end
 
 def initialize_deck
   SUITS.product(VALUES).shuffle
 end
 
-def deal_random_card(cards, hand)
+def deal_card(cards, hand)
   hand.push(cards.pop)
 end
 
 def correct_value_for_aces(values, sum)
   values.select { |value| value == "A" }.count.times do
-    sum -= 10 if sum > 21
+    sum -= 10 if sum > MAX_TOTAL_VALUE
   end
   sum
+end
+
+def find_card_value(value)
+  return 11 if value == "A"
+  return 10 if value.to_i.zero? # 'J', 'Q', 'K'
+  value.to_i
 end
 
 def total_value(cards)
   # cards = [['H', '3'], ['S', 'Q'], ... ]
   values = cards.map { |card| card[1] }
-
   sum = 0
-  values.each do |value|
-    if value == "A"
-      sum += 11
-    elsif value.to_i.zero? # 'J', 'Q', 'K'
-      sum += 10
-    else
-      sum += value.to_i
-    end
-  end
 
+  values.each do |value|
+    sum += find_card_value(value)
+  end
   correct_value_for_aces(values, sum)
 end
 
+def pretty_cards(cards)
+  cards.map { |card| "#{card[1]} of #{SUIT_NAMES[card[0].to_sym]}" }
+end
+
 def busted?(cards)
-  total_value(cards) > 21
+  total_value(cards) > MAX_TOTAL_VALUE
 end
 
-def find_result(player_score, dealer_score)
-  if player_score > 21
-    :player_busted
-  elsif dealer_score > 21
-    :dealer_busted
-  elsif player_score > dealer_score
-    :player
-  elsif dealer_score > player_score
-    :dealer
-  else
-    :tie
+def ask_hit_or_stay
+  player_choice = nil
+  loop do
+    prompt("Would you like to (h)it or (s)tay?")
+    player_choice = gets.chomp.downcase
+    break if ['h', 's'].include?(player_choice)
+    prompt("Sorry, you must enter 'h' or 's'.")
   end
+  player_choice
 end
 
-def display_winner(player_score, dealer_score)
-  result = find_result(player_score, dealer_score)
-  
-  case result
-  when :player_busted
-    prompt "You busted! Dealer wins!"
-  when :dealer_busted
-    prompt "Dealer busted! You win!"
-  when :player
-    prompt "You win!"
-  when :dealer
-    prompt "Dealer wins, better luck next time!"
-  when :tie
-    prompt "It's a tie!"
+def display_result_of_stay(name, total)
+  if name == :player
+    prompt("You chose to stay at #{total}. (Hit return to continue)")
+  elsif name == :dealer
+    prompt("The dealer chose to stay at #{total}. (Hit return to continue)")
   end
+  gets
+  clear_screen
 end
 
 def play_again?
@@ -86,82 +88,143 @@ def play_again?
   end
 end
 
-def play_again_if_busted?
-  play_again? ? next : break
+def find_result(player_score, dealer_score)
+  if player_score > 21
+    :player_busted
+  elsif dealer_score > 21
+    :dealer_busted
+  elsif dealer_score < player_score
+    :player
+  elsif dealer_score > player_score
+    :dealer
+  else
+    :tie
+  end
+end
+
+def display_winner_of_round(result)
+  case result
+  when :player_busted
+    prompt "You busted! The dealer wins!"
+  when :dealer_busted
+    prompt "The dealer busted! You win!"
+  when :player
+    prompt "You win!"
+  when :dealer
+    prompt "The dealer wins!"
+  when :tie
+    prompt "It's a tie!"
+  end
+end
+
+def find_winner(result)
+  case result
+  when :player, :dealer_busted
+    "Player"
+  when :dealer, :player_busted
+    "The dealer"
+  end
+end
+
+def update_scores(result, scores)
+  winner = find_winner(result)
+  if winner == "Player"
+    scores[:player] += 1
+  elsif winner == "The dealer"
+    scores[:dealer] += 1
+  end
 end
 
 loop do
-  deck = initialize_deck
-  player_hands = []
-  dealer_hands = []
-  
-  2.times do
-    deal_random_card(deck, player_hands)
-    deal_random_card(deck, dealer_hands)
-  end
+  scores = { player: 0, dealer: 0 }
+  round = 1
 
+  clear_screen
   prompt("Welcome to Twenty-One!")
-  # explain rules and suit abbreviations ??? 
-  prompt("The dealer has #{dealer_hands[0]} and an unknown card.")
-  prompt("You have #{player_hands[0]} and #{player_hands[1]} for a total of #{total_value(player_hands)}.")
 
-  # player turn
   loop do
-    player_choice = nil
-    
+    deck = initialize_deck
+    player_hands = []
+    dealer_hands = []
+
+    2.times do
+      deal_card(deck, player_hands)
+      deal_card(deck, dealer_hands)
+    end
+
+    puts "--------------"
+    puts "Round #{round}"
+    puts "--------------"
+    prompt("The dealer has #{pretty_cards([dealer_hands[0]])}" \
+           "and an unknown card.")
+    prompt("You have #{pretty_cards([player_hands[0]])} and " \
+          "#{pretty_cards([player_hands[1]])} for a total of " \
+          "#{total_value(player_hands)}.")
+
+    # player turn
     loop do
-      prompt("Would you like to (h)it or (s)tay?")
-      player_choice = gets.chomp.downcase
-      break if ['h', 's'].include?(player_choice)
-      prompt("Sorry, you must enter 'h' or 's'.")
+      player_choice = ask_hit_or_stay
+
+      if player_choice == 'h'
+        deal_card(deck, player_hands)
+        prompt("You chose to hit!")
+        sleep 0.6
+        prompt("Your current hand is: #{pretty_cards(player_hands)}")
+        prompt("Your total is: #{total_value(player_hands)}")
+      end
+      break if player_choice == 's' || busted?(player_hands)
     end
-    
-    if player_choice == 'h'
-      deal_random_card(deck, player_hands)
-      prompt("You chose to hit!")
-      prompt("Your current hand is: #{player_hands}")
-      prompt("Your total is: #{total_value(player_hands)}")
+
+    player_total = total_value(player_hands)
+    if busted?(player_hands)
+      sleep 1
+      dealer_total = total_value(dealer_hands)
+    else
+      display_result_of_stay(:player, player_total)
+
+      # dealer turn
+      prompt("The dealer's turn...")
+
+      loop do
+        break if busted?(dealer_hands) ||
+                 total_value(dealer_hands) >= DEALER_MAX_VALUE
+        prompt("The dealer hits.")
+        sleep 0.6
+        deal_card(deck, dealer_hands)
+        prompt("The dealer's cards are now: #{pretty_cards(dealer_hands)}")
+        sleep 0.6
+      end
+
+      dealer_total = total_value(dealer_hands)
+      if !busted?(dealer_hands)
+        display_result_of_stay(:dealer, dealer_total)
+      end
     end
-    
-    break if player_choice == 's' || busted?(player_hands)
+
+    puts "================================================="
+    prompt("The dealer has #{pretty_cards(dealer_hands)} " \
+           "for a total of #{dealer_total}.")
+    prompt("You have #{pretty_cards(player_hands)} " \
+           "for a total of #{player_total}.")
+    puts "================================================="
+    sleep 1
+
+    round_result = find_result(player_total, dealer_total)
+    update_scores(round_result, scores)
+
+    if scores.value?(WINNING_POINTS)
+      prompt("#{find_winner(round_result)} wins with #{WINNING_POINTS} points!")
+      break
+    else
+      display_winner_of_round(round_result)
+      round += 1
+      prompt("Current scores: Player - #{scores[:player]}, "\
+             "Dealer - #{scores[:dealer]} (Hit return to continue)")
+      gets
+      clear_screen
+    end
   end
 
-  player_total = total_value(player_hands)
-  if busted?(player_hands)
-    prompt("You busted! Dealer wins!")
-    play_again? ? next : break
-  else
-    prompt("You chose to stay at #{player_total}. (Hit return to continue)")
-    gets
-  end
-
-  # dealer turn
-  prompt("The dealer's turn...")
-  
-  loop do
-    break if busted?(dealer_hands) || total_value(dealer_hands) >= 17
-    
-    prompt("The dealer hits.")
-    deal_random_card(deck, dealer_hands)
-    prompt("The dealer's cards are now: #{dealer_hands}")
-  end
-
-  dealer_total = total_value(dealer_hands)
-  if busted?(dealer_hands)
-    prompt("The dealer's total is now: #{total_value(dealer_total)}")
-    display_winner(player_hands, dealer_hands)
-    play_again? ? next : break
-  else
-    prompt("The dealer stays at #{dealer_total}. (Hit return to continue)")
-    gets
-  end
-  
-  puts "==================================="
-  prompt("The dealer has #{dealer_hands} for a total of #{dealer_total}.")
-  prompt("You have #{player_hands} for a total of #{player_total}.")
-  puts "==================================="
-  
-  display_winner(player_hands, dealer_hands)
   break unless play_again?
 end
 

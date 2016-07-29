@@ -1,13 +1,5 @@
-Style/BlockComments:
-  Description: 'Do not use block comments.'
-  StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#no-block-comments'
-  Enabled: false
-
-Style/GuardClause:
-  Description: Check for conditionals that can be replaced with guard clauses
-  StyleGuide: https://github.com/bbatsov/ruby-style-guide#no-nested-conditionals
-  Enabled: false
-  MinBodyLength: 1
+AllCops:
+  TargetRubyVersion: 2.2
 
 Style/IfUnlessModifier:
   Description: Favor modifier if/unless usage when you have a single-line body.
