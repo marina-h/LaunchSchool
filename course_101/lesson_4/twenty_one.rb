@@ -11,8 +11,6 @@ MAX_TOTAL_VALUE = 21
 DEALER_MAX_VALUE = 17
 WINNING_POINTS = 5
 
-require 'pry'
-
 def prompt(msg)
   puts "=> #{msg}"
 end
