@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 SUITS = %w(H S C D).freeze
 VALUES = %w(2 3 4 5 6 7 8 9 10 J Q K A).freeze
 SUIT_NAMES = { 'H': 'hearts',
@@ -8,6 +10,8 @@ SUIT_NAMES = { 'H': 'hearts',
 MAX_TOTAL_VALUE = 21
 DEALER_MAX_VALUE = 17
 WINNING_POINTS = 5
+
+require 'pry'
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -21,7 +25,7 @@ def initialize_deck
   SUITS.product(VALUES).shuffle
 end
 
-def deal_card(cards, hand)
+def deal_card!(cards, hand)
   hand.push(cards.pop)
 end
 
@@ -53,6 +57,24 @@ def pretty_cards(cards)
   cards.map { |card| "#{card[1]} of #{SUIT_NAMES[card[0].to_sym]}" }
 end
 
+def initialize_hands(deck, player_cards, dealer_cards)
+  2.times do
+    deal_card!(deck, player_cards)
+    deal_card!(deck, dealer_cards)
+  end
+end
+
+def display_round_start(round, player_cards, dealer_cards)
+  puts "--------------"
+  puts "Round #{round}"
+  puts "--------------"
+  prompt("The dealer has #{pretty_cards([dealer_cards[0]])} " \
+         "and an unknown card.")
+  prompt("You have #{pretty_cards([player_cards[0]])} and " \
+        "#{pretty_cards([player_cards[1]])} for a total of " \
+        "#{total_value(player_cards)}.")
+end
+
 def busted?(cards)
   total_value(cards) > MAX_TOTAL_VALUE
 end
@@ -70,12 +92,38 @@ end
 
 def display_result_of_stay(name, total)
   if name == :player
-    prompt("You chose to stay at #{total}. (Hit return to continue)")
+    prompt("You chose to stay at #{total}.")
+    prompt("The dealer's turn...")
   elsif name == :dealer
-    prompt("The dealer chose to stay at #{total}. (Hit return to continue)")
+    prompt("The dealer chose to stay at #{total}.")
   end
-  gets
-  clear_screen
+end
+
+def run_player_turn(player_cards, deck)
+  loop do
+    player_choice = ask_hit_or_stay
+
+    if player_choice == 'h'
+      deal_card!(deck, player_cards)
+      prompt("You chose to hit!")
+      sleep 0.6
+      prompt("Your current hand is: #{pretty_cards(player_cards)}")
+      prompt("Your total is: #{total_value(player_cards)}")
+    end
+    break if player_choice == 's' || busted?(player_cards)
+  end
+end
+
+def run_dealer_turn(dealer_cards, deck)
+  loop do
+    break if busted?(dealer_cards) ||
+             total_value(dealer_cards) >= DEALER_MAX_VALUE
+    prompt("The dealer hits.")
+    sleep 0.6
+    deal_card!(deck, dealer_cards)
+    prompt("The dealer's cards are now: #{pretty_cards(dealer_cards)}")
+    sleep 0.6
+  end
 end
 
 def play_again?
@@ -102,6 +150,16 @@ def find_result(player_score, dealer_score)
   end
 end
 
+def display_summary(dealer_cards, dealer_score, player_cards, player_score)
+  puts "================================================="
+  prompt("The dealer has #{pretty_cards(dealer_cards)} " \
+         "for a total of #{dealer_score}.")
+  prompt("You have #{pretty_cards(player_cards)} " \
+         "for a total of #{player_score}.")
+  puts "================================================="
+  sleep 1
+end
+
 def display_winner_of_round(result)
   case result
   when :player_busted
@@ -115,6 +173,14 @@ def display_winner_of_round(result)
   when :tie
     prompt "It's a tie!"
   end
+end
+
+def display_round_summary(result, scores)
+  display_winner_of_round(result)
+  prompt("Current scores: Player - #{scores[:player]}, "\
+         "Dealer - #{scores[:dealer]} (Hit return to continue)")
+  gets
+  clear_screen
 end
 
 def find_winner(result)
@@ -138,7 +204,6 @@ end
 loop do
   scores = { player: 0, dealer: 0 }
   round = 1
-
   clear_screen
   prompt("Welcome to Twenty-One!")
 
@@ -146,69 +211,26 @@ loop do
     deck = initialize_deck
     player_hands = []
     dealer_hands = []
+    initialize_hands(deck, player_hands, dealer_hands)
 
-    2.times do
-      deal_card(deck, player_hands)
-      deal_card(deck, dealer_hands)
-    end
-
-    puts "--------------"
-    puts "Round #{round}"
-    puts "--------------"
-    prompt("The dealer has #{pretty_cards([dealer_hands[0]])}" \
-           "and an unknown card.")
-    prompt("You have #{pretty_cards([player_hands[0]])} and " \
-          "#{pretty_cards([player_hands[1]])} for a total of " \
-          "#{total_value(player_hands)}.")
-
-    # player turn
-    loop do
-      player_choice = ask_hit_or_stay
-
-      if player_choice == 'h'
-        deal_card(deck, player_hands)
-        prompt("You chose to hit!")
-        sleep 0.6
-        prompt("Your current hand is: #{pretty_cards(player_hands)}")
-        prompt("Your total is: #{total_value(player_hands)}")
-      end
-      break if player_choice == 's' || busted?(player_hands)
-    end
-
+    display_round_start(round, player_hands, dealer_hands)
+    run_player_turn(player_hands, deck)
     player_total = total_value(player_hands)
+
     if busted?(player_hands)
       sleep 1
       dealer_total = total_value(dealer_hands)
     else
       display_result_of_stay(:player, player_total)
-
-      # dealer turn
-      prompt("The dealer's turn...")
-
-      loop do
-        break if busted?(dealer_hands) ||
-                 total_value(dealer_hands) >= DEALER_MAX_VALUE
-        prompt("The dealer hits.")
-        sleep 0.6
-        deal_card(deck, dealer_hands)
-        prompt("The dealer's cards are now: #{pretty_cards(dealer_hands)}")
-        sleep 0.6
-      end
-
+      run_dealer_turn(dealer_hands, deck)
       dealer_total = total_value(dealer_hands)
+
       if !busted?(dealer_hands)
         display_result_of_stay(:dealer, dealer_total)
       end
     end
 
-    puts "================================================="
-    prompt("The dealer has #{pretty_cards(dealer_hands)} " \
-           "for a total of #{dealer_total}.")
-    prompt("You have #{pretty_cards(player_hands)} " \
-           "for a total of #{player_total}.")
-    puts "================================================="
-    sleep 1
-
+    display_summary(dealer_hands, dealer_total, player_hands, player_total)
     round_result = find_result(player_total, dealer_total)
     update_scores(round_result, scores)
 
@@ -216,12 +238,8 @@ loop do
       prompt("#{find_winner(round_result)} wins with #{WINNING_POINTS} points!")
       break
     else
-      display_winner_of_round(round_result)
+      display_round_summary(round_result, scores)
       round += 1
-      prompt("Current scores: Player - #{scores[:player]}, "\
-             "Dealer - #{scores[:dealer]} (Hit return to continue)")
-      gets
-      clear_screen
     end
   end
 
