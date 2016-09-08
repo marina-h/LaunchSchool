@@ -3,6 +3,7 @@
 
 def fibonacci(nth)
   return 1 if nth <= 2
+  # first = last = 1
   first, last = [1, 1]
   (3..nth).each do
     # third = first + second
