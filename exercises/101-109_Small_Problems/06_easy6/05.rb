@@ -4,10 +4,12 @@
 # wrote in the previous exercise.
 
 def reverse(arr)
-  reversed_arr = []
-  arr.each { |element| reversed_arr.unshift(element) }
-  reversed_arr
+  # reversed_arr = []
+  # arr.each { |element| reversed_arr.unshift(element) }
+  # reversed_arr
   # arr.inject([]) { |new_array, elem| new_array.unshift(elem) }
+  # alternative:
+  1.upto(arr.length).map { |i| arr[-i] }
 end
 
 p reverse([1, 2, 3, 4]) == [4, 3, 2, 1]    # => true
