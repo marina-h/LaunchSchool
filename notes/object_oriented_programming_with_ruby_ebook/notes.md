@@ -129,3 +129,7 @@ fido.a_public_method
 - `extend` is similar to `include` within a class, but allows access to the extended class's methods from the class itself (not just instances)
 
 - **collaborator objects** refer to (custom) objects that are assigned to instance variables, such as adding a `Pets` array as an instance variable to a `Person` class
+-------
+- `self.var_name` vs ``@var_name`
+  - use @ version for initialization
+  - use self. version for setting variable within class (use specific setter instead of just accessing the variable)
