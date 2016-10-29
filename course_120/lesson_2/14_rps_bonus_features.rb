@@ -80,36 +80,8 @@ class Computer < Player
 
   def initialize
     super
-    @name = ['R2D2', 'Hal', 'Chappie', 'Sonny', 'Number 5'].sample
     @percent_lost_by_hand = Hash.new { |k, v| k[v] = 0 }
-    set_possible_moves
     reset_move_probabilities
-  end
-
-  def set_possible_moves
-    @possible_moves_computer =
-      case name
-      when 'R2D2'     then %w(rock)
-      when 'Hal'      then %w(rock scissors lizard spock)
-      when 'Chappie'  then %w(rock paper scissors lizard spock)
-      when 'Sonny'    then %w(rock paper scissors lizard spock)
-      when 'Number 5' then %w(rock paper scissors lizard)
-      end
-  end
-
-  def reset_move_probabilities
-    @move_probabilities =
-      case name
-      when 'R2D2'     then { 'rock' => 1.0 }
-      when 'Hal'      then { 'rock' => 0.1, 'scissors' => 0.6, 'lizard' => 0.15,
-                             'spock' => 0.15 }
-      when 'Chappie'  then { 'rock' => 0.2, 'scissors' => 0.2, 'paper' => 0.2,
-                             'lizard' => 0.2, 'spock' => 0.2 }
-      when 'Sonny'    then { 'rock' => 0.1, 'paper' => 0.1, 'scissors' => 0.1,
-                             'lizard' => 0.35, 'spock' => 0.35 }
-      when 'Number 5' then { 'rock' => 0.25, 'paper' => 0.25,
-                             'scissors' => 0.25, 'lizard' => 0.25 }
-      end
   end
 
   def calculate_lose_rates(human_history)
@@ -169,14 +141,90 @@ class Computer < Player
   end
 end
 
+class R2D2 < Computer
+  def initialize
+    super
+    @name = 'R2D2'
+    @possible_moves_computer = %w(rock)
+  end
+
+  def reset_move_probabilities
+    @move_probabilities = { 'rock' => 1.0 }
+  end
+end
+
+class Hal < Computer
+  def initialize
+    super
+    @name = 'Hal'
+    @possible_moves_computer = %w(rock scissors lizard spock)
+  end
+
+  def reset_move_probabilities
+    @move_probabilities = { 'rock' => 0.1, 'scissors' => 0.6,
+                            'lizard' => 0.15, 'spock' => 0.15 }
+  end
+end
+
+class Chappie < Computer
+  def initialize
+    super
+    @name = 'Chappie'
+    @possible_moves_computer = %w(rock paper scissors lizard spock)
+  end
+
+  def reset_move_probabilities
+    @move_probabilities = { 'rock' => 0.2, 'scissors' => 0.2,
+                            'paper' => 0.2, 'lizard' => 0.2, 'spock' => 0.2 }
+  end
+end
+
+class Sonny < Computer
+  def initialize
+    super
+    @name = 'Sonny'
+    @possible_moves_computer = %w(rock paper scissors lizard spock)
+  end
+
+  def reset_move_probabilities
+    @move_probabilities = { 'rock' => 0.1, 'paper' => 0.1, 'scissors' => 0.1,
+                            'lizard' => 0.35, 'spock' => 0.35 }
+  end
+end
+
+class Number5 < Computer
+  def initialize
+    super
+    @name = 'Number 5'
+    @possible_moves_computer = %w(rock paper scissors lizard)
+  end
+
+  def reset_move_probabilities
+    @move_probabilities = { 'rock' => 0.25, 'paper' => 0.25, 'scissors' => 0.25,
+                            'lizard' => 0.25 }
+  end
+end
+
 class RPSGame
   include GameConstants
   attr_accessor :human, :computer, :max_points
 
   def initialize
     @human = Human.new
-    @computer = Computer.new
     @max_points = nil
+    choose_random_computer
+  end
+
+  def choose_random_computer
+    num = (1..5).to_a.sample
+    @computer =
+      case num
+      when 1 then R2D2.new
+      when 2 then Hal.new
+      when 3 then Chappie.new
+      when 4 then Sonny.new
+      when 5 then Number5.new
+      end
   end
 
   def self.clear_screen
@@ -256,14 +304,10 @@ class RPSGame
     answer == 'y'
   end
 
-  def reset_scores
+  def reset_game
     human.score = 0
-    computer.score = 0
-  end
-
-  def reset_history
     human.history = []
-    computer.history = []
+    choose_random_computer
   end
 
   def play_round
@@ -286,9 +330,7 @@ class RPSGame
       play_round
       display_winner
       break unless play_again?
-      reset_scores
-      reset_history
-      @computer = Computer.new
+      reset_game
       RPSGame.clear_screen
     end
     display_goodbye_message
