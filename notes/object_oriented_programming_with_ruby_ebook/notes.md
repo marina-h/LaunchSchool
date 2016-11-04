@@ -130,6 +130,61 @@ fido.a_public_method
 
 - **collaborator objects** refer to (custom) objects that are assigned to instance variables, such as adding a `Pets` array as an instance variable to a `Person` class
 -------
-- `self.var_name` vs ``@var_name`
+- `self.var_name` vs `@var_name`
   - use @ version for initialization
   - use self. version for setting variable within class (use specific setter instead of just accessing the variable)
+-------
+### Equality
+- the `==` operator is actually an instance method that compares the specified values for that class (default for BasicObject is to compare the object IDs)
+```ruby
+45 == 45.00  # => true
+# because it is actually calling an Integer method 45.==(45.00) which converts the float into an integer
+```
+- the `===` method is used in `case` statements
+- usually signifies that an object is a member of a group
+```ruby
+(1..5) === 3           # => true
+(1..5) === 6           # => false
+
+Integer === 42          # => true
+Integer === 'fourtytwo' # => false
+
+ /ell/ === 'Hello'     # => true
+ /ell/ === 'Foobar'    # => false
+```
+- `.equal?` compares whether the object IDs are the same
+
+### Variable scope
+- instance variables that are not initialized yet in an object return `nil` if you try to access it
+```ruby
+class Person
+  def get_name
+    @name                     # the @name ivar is not initialized anywhere
+  end
+end
+
+bob = Person.new
+bob.get_name                  # => nil
+# This shows another distinction from local variables. If you try to reference an uninitialized local variable, you'd get a NameError. But if you try to reference an uninitialized instance variable, you get nil.
+```
+- avoid using class variables (@@) with inheritance, since subclasses can modify its parent's variables (there is only ONE copy of the variable)
+- Constants have lexical scope (location is important) which makes their scope resolution rules very unique compared to other variable types. If Ruby doesn't find the constant using lexical scope, it'll then look at the inheritance hierarchy.
+```ruby
+module Maintenance
+  def change_tires
+    "Changing #{WHEELS} tires."
+  end
+end
+
+class Vehicle
+  WHEELS = 4
+end
+
+class Car < Vehicle
+  include Maintenance
+end
+
+a_car = Car.new
+a_car.change_tires # => NameError: uninitialized constant Maintenance::WHEELS
+```
+- Things like `<<`, `+` and `==` are actually methods and can be overridden
