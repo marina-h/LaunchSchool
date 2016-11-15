@@ -171,7 +171,7 @@ module PlayerQuestions
     ask_for_max_score
     ask_if_going_first
     @human = Human.new(@human_name, @human_marker, @playing_first)
-    @is_human_turn = @playing_first ? true : false
+    @is_human_turn = @playing_first
   end
 
   def ask_for_name
@@ -204,7 +204,7 @@ module PlayerQuestions
     answer = nil
     loop do
       answer = gets.chomp
-      break if answer.length == 1 && (/[[:print:]]/ =~ answer)
+      break if answer.length == 1 && (/[[:graph:]]/ =~ answer)
       puts "Sorry, you can only use 1 character markers."
     end
     @human_marker = answer
@@ -218,7 +218,7 @@ module PlayerQuestions
       break if %w(y n).include?(answer)
       puts "Sorry, please type y or n."
     end
-    @playing_first = answer == 'y' ? true : false
+    @playing_first = answer == 'y'
   end
 end
 
@@ -257,7 +257,6 @@ module GameMessages
   end
 
   def display_round_result
-    display_board
     case board.winning_marker
     when human.marker
       puts "#{human.name} wins!"
@@ -327,12 +326,12 @@ class TTTGame
     loop do
       loop do
         current_player_moves
-        display_board
         break if board.someone_won? || board.full?
         clear_screen_and_display_board if @is_human_turn
       end
       update_scores
-      display_board
+      clear_screen
+      clear_screen_and_display_board
       break if winning_score?
 
       display_round_result
@@ -365,7 +364,7 @@ class TTTGame
 
   def reset_round
     board.reset
-    @is_human_turn = human.playing_first ? true : false
+    @is_human_turn = human.playing_first
     clear_screen
   end
 
