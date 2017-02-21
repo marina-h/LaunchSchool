@@ -15,6 +15,8 @@ Preparatory materials from Course #100 can be found [here](https://github.com/ma
 
 ### 120: 	Object Oriented Programming
 #### - [Lesson 2: Object Oriented Programming](course_120/lesson_2)
+#### - [Lesson 4: Exercises](course_120/lesson_4)
+#### - [Lesson 5: Object Oriented Tic Tac Toe](course_120/lesson_5)
 
 ### Exercises
 #### - [101-109 Small Problems](exercises/101-109_Small_Problems)
